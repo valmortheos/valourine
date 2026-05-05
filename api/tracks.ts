@@ -3,22 +3,26 @@ import path from 'path';
 import fs from 'fs';
 
 export default function handler(req: VercelRequest, res: VercelResponse) {
-  // Gunakan process.cwd() untuk mendapatkan root project di Vercel
+  // Gunakan path.resolve untuk keamanan di environment serverless
   const root = process.cwd();
-  const musicDir = path.join(root, 'public', 'music');
-  const thumbDir = path.join(root, 'public', 'musicthumb');
+  const musicDir = path.resolve(root, 'public/music');
+  const thumbDir = path.resolve(root, 'public/musicthumb');
   
   const errors: any[] = [];
   const tracks: any[] = [];
 
-  // Proteksi jika folder tidak ada
+  // Log untuk debugging di Vercel Dashboard
+  console.log('Scanning directories:', { musicDir, thumbDir });
+
   if (!fs.existsSync(musicDir)) {
-    errors.push({ 
-      type: 'DIR_MISSING', 
-      path: '/public/music', 
-      message: 'Folder music tidak terdeteksi di server.' 
+    return res.status(200).json({ 
+      tracks: [], 
+      errors: [{ 
+        type: 'DIR_MISSING', 
+        path: musicDir, 
+        message: 'Folder music tidak ditemukan di environment ini.' 
+      }] 
     });
-    return res.status(200).json({ tracks: [], errors });
   }
 
   try {
