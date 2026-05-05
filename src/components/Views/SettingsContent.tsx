@@ -3,12 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Download, Upload, Trash2, Info, ChevronRight, LogOut } from 'lucide-react';
+import { Download, Upload, Trash2, Info, ChevronRight, LogOut, User } from 'lucide-react';
 import { db } from '../../lib/db';
 import { useDebugStore } from '../../store/useDebugStore';
+import { useAuthStore } from '../../store/useAuthStore';
+import { AnimatePresence } from 'motion/react';
+import { useState } from 'react';
+import ProfileEdit from '../Settings/ProfileEdit';
 import JSZip from 'jszip';
 
 export default function SettingsContent() {
+  const [showEdit, setShowEdit] = useState(false);
+  const { profile, signOut } = useAuthStore();
+  
   const handleExportCache = async () => {
     try {
       const zip = new JSZip();
@@ -57,21 +64,29 @@ export default function SettingsContent() {
 
       <section className="space-y-4">
         <h2 className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">Account</h2>
-        <div className="glass-card flex items-center p-4">
-           <div className="w-12 h-12 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold text-lg">
-             JD
+        <button 
+          onClick={() => setShowEdit(true)}
+          className="w-full glass-card flex items-center p-4 active:scale-[0.98] transition-transform"
+        >
+           <div className="w-14 h-14 rounded-2xl bg-zinc-900 flex items-center justify-center text-white font-black overflow-hidden shadow-xl">
+             {profile?.avatar_url ? (
+               <img src={profile.avatar_url} className="w-full h-full object-cover" />
+             ) : (
+               profile?.username?.charAt(0).toUpperCase()
+             )}
            </div>
-           <div className="ml-4 flex-grow">
-             <h3 className="font-bold text-zinc-900 text-sm">John Doe</h3>
-             <p className="text-zinc-500 text-xs">Premium Member</p>
+           <div className="ml-4 flex-grow text-left">
+             <h3 className="font-bold text-zinc-900 text-base">{profile?.username || 'User'}</h3>
+             <p className="text-zinc-500 text-xs font-bold uppercase tracking-widest">Edit Profile & Avatar</p>
            </div>
-           <button className="text-zinc-400"><ChevronRight size={20} /></button>
-        </div>
+           <ChevronRight className="text-zinc-300" size={24} />
+        </button>
       </section>
 
       <section className="space-y-4">
         <h2 className="text-[11px] font-bold uppercase tracking-widest text-zinc-400">Storage & Cache</h2>
         <div className="space-y-2">
+          {/* ... existing storage buttons ... */}
           <button 
             onClick={handleExportCache}
             className="w-full glass-card flex items-center p-4 group"
@@ -117,9 +132,16 @@ export default function SettingsContent() {
         </div>
       </section>
 
-      <button className="w-full h-14 rounded-2xl bg-zinc-100 text-zinc-900 font-bold text-sm flex items-center justify-center gap-2 mt-8">
+      <button 
+        onClick={signOut}
+        className="w-full h-14 rounded-2xl bg-zinc-100 text-zinc-900 font-bold text-sm flex items-center justify-center gap-2 mt-8 active:scale-95 transition-transform"
+      >
         <LogOut size={18} /> Logout
       </button>
+
+      <AnimatePresence>
+        {showEdit && <ProfileEdit onClose={() => setShowEdit(false)} />}
+      </AnimatePresence>
     </div>
   );
 }

@@ -5,12 +5,15 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { usePlayerStore } from '../store/usePlayerStore';
+import { useAuthStore } from '../store/useAuthStore';
 import { db } from '../lib/db';
+import { supabase } from '../lib/supabase';
 import { FastAverageColor } from 'fast-average-color';
 import { type Track } from '../types';
 
 export function useAudio() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { user } = useAuthStore();
   const { 
     currentTrack, 
     isPlaying, 
@@ -24,6 +27,15 @@ export function useAudio() {
   } = usePlayerStore();
 
   const fac = new FastAverageColor();
+
+  // Log activity to Supabase
+  const logActivity = useCallback(async (track: Track) => {
+    if (!user) return;
+    await supabase.from('listening_stats').insert({
+      user_id: user.id,
+      track_id: track.id
+    });
+  }, [user]);
 
   // Initialize Audio Element
   useEffect(() => {
@@ -56,6 +68,7 @@ export function useAudio() {
         
         if (isPlaying) {
           audioRef.current.play().catch(e => console.error('Play error:', e));
+          logActivity(currentTrack);
         }
 
         // Color Extraction

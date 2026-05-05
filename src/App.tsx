@@ -13,7 +13,9 @@ import { Home, Search, Library, BarChart2, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { usePlayerStore } from './store/usePlayerStore';
 import { useDebugStore } from './store/useDebugStore';
+import { useAuthStore } from './store/useAuthStore';
 import { useAudio } from './hooks/useAudio';
+import { supabase } from './lib/supabase';
 import { cn } from './lib/utils';
 
 // Components
@@ -26,18 +28,36 @@ import LibraryContent from './components/Views/LibraryContent';
 import StatsContent from './components/Views/StatsContent';
 import SettingsContent from './components/Views/SettingsContent';
 import AdminPanel from './components/Admin/AdminPanel';
+import AuthScreen from './components/Auth/AuthScreen';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
+  
   const { currentTrack, accentColor, isFullPlayerOpen } = usePlayerStore();
   const { isAdminMode, setLogs, setScanTime } = useDebugStore();
+  const { session, setSession, isLoading: authLoading } = useAuthStore();
   
   // Initialize Global Audio
   useAudio();
 
+  // Auth Listener
   useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [setSession]);
+
+  useEffect(() => {
+    if (!session) return;
+    
     const fetchTracks = async () => {
       try {
         const res = await fetch('/api/tracks');
@@ -53,7 +73,19 @@ export default function App() {
     };
 
     fetchTracks();
-  }, [setLogs, setScanTime]);
+  }, [session, setLogs, setScanTime]);
+
+  if (authLoading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white">
+        <div className="w-10 h-10 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <AuthScreen />;
+  }
 
   const renderContent = () => {
     if (loading) return (
