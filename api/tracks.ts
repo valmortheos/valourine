@@ -5,29 +5,42 @@ import fs from 'fs';
 export default function handler(req: VercelRequest, res: VercelResponse) {
   // Gunakan path.resolve untuk keamanan di environment serverless
   const root = process.cwd();
+  // Di Vercel, includeFiles akan meletakkan file relatif terhadap function
+  // Kita coba deteksi folder music di beberapa lokasi common
   const musicDir = path.resolve(root, 'public/music');
   const thumbDir = path.resolve(root, 'public/musicthumb');
   
-  const errors: any[] = [];
-  const tracks: any[] = [];
+  console.log('Vercel Scan Start:', { root, musicDir, thumbDir });
 
-  // Log untuk debugging di Vercel Dashboard
-  console.log('Scanning directories:', { musicDir, thumbDir });
+  // Backup detection jika path standar gagal (Vercel specific)
+  let finalMusicDir = musicDir;
+  let finalThumbDir = thumbDir;
 
-  if (!fs.existsSync(musicDir)) {
+  if (!fs.existsSync(finalMusicDir)) {
+    // Coba path relatif jika process.cwd() berbeda
+    const altPath = path.resolve(root, '../public/music');
+    if (fs.existsSync(altPath)) {
+       finalMusicDir = altPath;
+       finalThumbDir = path.resolve(root, '../public/musicthumb');
+    }
+  }
+
+  if (!fs.existsSync(finalMusicDir)) {
     return res.status(200).json({ 
       tracks: [], 
       errors: [{ 
         type: 'DIR_MISSING', 
-        path: musicDir, 
-        message: 'Folder music tidak ditemukan di environment ini.' 
+        path: finalMusicDir, 
+        message: 'Data musik tidak ditemukan (403/NotFound Prevention).' 
       }] 
     });
   }
 
   try {
-    const musicFiles = fs.readdirSync(musicDir).filter(f => /\.(mp3|flac|m4a|opus)$/i.test(f));
-    const thumbFiles = fs.existsSync(thumbDir) ? fs.readdirSync(thumbDir).filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f)) : [];
+    const errors: any[] = [];
+    const tracks: any[] = [];
+    const musicFiles = fs.readdirSync(finalMusicDir).filter(f => /\.(mp3|flac|m4a|opus)$/i.test(f));
+    const thumbFiles = fs.existsSync(finalThumbDir) ? fs.readdirSync(finalThumbDir).filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f)) : [];
 
     musicFiles.forEach(file => {
       const name = path.parse(file).name;
