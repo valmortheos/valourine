@@ -43,16 +43,25 @@ export default function SettingsContent() {
     }
   };
 
-  const { incrementVersionClicks, versionClicks, resetVersionClicks, setIsAdminMode } = useDebugStore();
+  const { incrementVersionClicks, versionClicks, resetVersionClicks, setIsAdminMode, addLog } = useDebugStore();
 
   const handleVersionClick = () => {
+    console.log('Version click:', versionClicks + 1);
     incrementVersionClicks();
+    
     if (versionClicks + 1 >= 5) {
       const code = prompt('Enter Admin Passcode:');
       if (code === '7777') {
         setIsAdminMode(true);
+        resetVersionClicks();
+      } else {
+        addLog({
+          type: 'GENERAL_ERROR',
+          message: 'Failed admin login attempt with wrong code',
+          path: '/settings'
+        });
+        resetVersionClicks();
       }
-      resetVersionClicks();
     }
   };
 

@@ -5,7 +5,9 @@
 
 import { Play } from 'lucide-react';
 import { usePlayerStore } from '../../store/usePlayerStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { type Track } from '../../types';
+import { cn } from '../../lib/utils';
 
 interface HomeContentProps {
   tracks: Track[];
@@ -13,6 +15,7 @@ interface HomeContentProps {
 
 export default function HomeContent({ tracks }: HomeContentProps) {
   const { setCurrentTrack, setIsPlaying, setQueue, currentTrack } = usePlayerStore();
+  const { profile } = useAuthStore();
 
   const handlePlay = (track: Track) => {
     setQueue(tracks);
@@ -20,13 +23,22 @@ export default function HomeContent({ tracks }: HomeContentProps) {
     setIsPlaying(true);
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Morning';
+    if (hour < 18) return 'Afternoon';
+    return 'Evening';
+  };
+
   return (
     <div className="space-y-8">
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900">
-          Good Afternoon,
+      <header className="mb-10">
+        <h1 className="text-4xl font-black tracking-tighter text-zinc-900">
+          Good {getGreeting()},
         </h1>
-        <p className="text-zinc-500 font-medium">Discover your rhythm today.</p>
+        <p className="text-zinc-400 text-sm font-black uppercase tracking-[0.2em] mt-1">
+          {profile?.username || 'Valourine User'}
+        </p>
       </header>
 
       <section>
@@ -67,28 +79,39 @@ export default function HomeContent({ tracks }: HomeContentProps) {
       </section>
 
       <section className="pb-10">
-        <h2 className="text-lg font-bold text-zinc-900 uppercase tracking-widest text-[11px] mb-4">
-          Your Library
+        <h2 className="text-[11px] font-black uppercase tracking-[0.2em] text-zinc-400 mb-6 px-1">
+          Internal Collection
         </h2>
         <div className="space-y-3">
           {tracks.map((track) => (
             <div 
               key={track.id}
               onClick={() => handlePlay(track)}
-              className="glass-card flex items-center group active:scale-[0.98] transition-transform"
+              className="glass-card flex items-center group active:scale-[0.98] transition-transform border-white/50"
             >
-              <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+              <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
                 <img src={track.thumbnailUrl} alt={track.title} className="w-full h-full object-cover" />
               </div>
               <div className="ml-4 flex-grow">
                 <h3 className="font-bold text-zinc-900 text-sm line-clamp-1">{track.title}</h3>
-                <p className="text-zinc-500 text-[10px] uppercase font-semibold tracking-wider">{track.artist}</p>
+                <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest">{track.artist}</p>
               </div>
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                <Play fill="currentColor" size={16} className="text-zinc-900" />
+              <div className={cn(
+                "transition-all duration-300",
+                currentTrack?.id === track.id ? "opacity-100 scale-100" : "opacity-0 group-hover:opacity-100"
+              )}>
+                <div className="w-8 h-8 rounded-full bg-zinc-900 text-white flex items-center justify-center">
+                  <Play fill="currentColor" size={12} className="ml-0.5" />
+                </div>
               </div>
             </div>
           ))}
+          {tracks.length === 0 && (
+            <div className="text-center py-20 bg-zinc-50/50 rounded-3xl border-2 border-dashed border-zinc-100">
+              <p className="text-zinc-400 font-bold text-sm">No music files detected in public/music</p>
+              <p className="text-[10px] uppercase tracking-widest text-zinc-400 mt-2">Scan system active</p>
+            </div>
+          )}
         </div>
       </section>
     </div>

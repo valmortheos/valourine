@@ -60,7 +60,7 @@ export default function FullPlayer() {
 
         <main className="flex-grow flex flex-col justify-center items-center mt-8">
           <motion.div 
-            className="w-full aspect-square rounded-3xl overflow-hidden shadow-2xl relative group"
+            className="w-full aspect-square rounded-[48px] overflow-hidden shadow-2xl relative group border-4 border-white"
             whileHover={{ scale: 1.02 }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
@@ -72,30 +72,31 @@ export default function FullPlayer() {
           </motion.div>
 
           <footer className="w-full mt-12 space-y-8">
-            <div className="flex items-end justify-between">
+            <div className="flex items-end justify-between px-2">
               <div className="space-y-1">
-                <h1 className="text-2xl font-bold text-zinc-900 leading-tight">
+                <h1 className="text-3xl font-black text-zinc-900 leading-tight tracking-tighter">
                   {currentTrack.title}
                 </h1>
-                <p className="text-base font-medium text-zinc-500 uppercase tracking-wider">
+                <p className="text-sm font-black text-zinc-400 uppercase tracking-[0.2em]">
                   {currentTrack.artist}
                 </p>
               </div>
-              <button className="text-zinc-300 hover:text-red-500 transition-colors">
-                <Heart size={24} />
+              <button className="text-zinc-200 hover:text-red-500 transition-colors active:scale-90">
+                <Heart size={28} />
               </button>
             </div>
 
             {/* Slider */}
-            <div className="space-y-2">
-              <div className="relative h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden cursor-pointer">
+            <div className="space-y-4 px-2">
+              <div className="relative h-1.5 w-full bg-zinc-100 rounded-full overflow-hidden cursor-pointer group">
                 <motion.div 
-                  className="absolute inset-y-0 left-0 bg-zinc-900"
+                  className="absolute inset-y-0 left-0 bg-zinc-900 z-10"
                   initial={false}
                   animate={{ width: `${progressPercent}%` }}
                 />
+                <div className="absolute inset-0 bg-zinc-100 opacity-50" />
               </div>
-              <div className="flex justify-between text-[10px] font-bold text-zinc-400 tracking-wider">
+              <div className="flex justify-between text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
                 <span>{formatTime(progress)}</span>
                 <span>{formatTime(duration)}</span>
               </div>
@@ -103,24 +104,24 @@ export default function FullPlayer() {
 
             {/* Controls */}
             <div className="flex items-center justify-between pt-4">
-              <button className="text-zinc-300"><Shuffle size={20} /></button>
+              <button className="text-zinc-200 hover:text-zinc-900 transition-colors"><Shuffle size={20} /></button>
               
-              <div className="flex items-center gap-8">
+              <div className="flex items-center gap-10">
                 <button 
                   onClick={previousTrack}
                   className="text-zinc-900 active:scale-90 transition-transform"
                 >
-                  <SkipBack size={32} fill="currentColor" />
+                  <SkipBack size={36} fill="currentColor" />
                 </button>
                 
                 <button 
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="w-20 h-20 flex items-center justify-center rounded-full bg-zinc-900 text-white shadow-xl active:scale-90 transition-all"
+                  className="w-24 h-24 flex items-center justify-center rounded-[32px] bg-zinc-900 text-white shadow-2xl shadow-zinc-200 active:scale-90 transition-all"
                 >
                   {isPlaying ? (
-                    <Pause size={32} fill="currentColor" />
+                    <Pause size={36} fill="currentColor" />
                   ) : (
-                    <Play size={32} fill="currentColor" className="ml-1" />
+                    <Play size={36} fill="currentColor" className="ml-1" />
                   )}
                 </button>
 
@@ -128,11 +129,11 @@ export default function FullPlayer() {
                   onClick={nextTrack}
                   className="text-zinc-900 active:scale-90 transition-transform"
                 >
-                  <SkipForward size={32} fill="currentColor" />
+                  <SkipForward size={36} fill="currentColor" />
                 </button>
               </div>
 
-              <button className="text-zinc-300"><Repeat size={20} /></button>
+              <button className="text-zinc-200 hover:text-zinc-900 transition-colors"><Repeat size={20} /></button>
             </div>
 
             <div className="flex items-center gap-3 pt-6 text-zinc-400">

@@ -46,8 +46,8 @@ export default function StatsContent() {
   return (
     <div className="space-y-8 pb-10">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Statistics</h1>
-        <p className="text-zinc-500 font-medium">Your real-time activity metrics.</p>
+        <h1 className="text-4xl font-black tracking-tighter text-zinc-900">Stats</h1>
+        <p className="text-zinc-400 text-sm font-bold uppercase tracking-[0.2em] mt-1">Real-time Activity</p>
       </header>
 
       <div className="grid grid-cols-2 gap-4">

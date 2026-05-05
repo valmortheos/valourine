@@ -63,6 +63,7 @@ export default function App() {
         const res = await fetch('/api/tracks');
         const data = await res.json();
         setTracks(data.tracks);
+        usePlayerStore.getState().setQueue(data.tracks); // Sync queue to store
         setLogs(data.errors);
         setScanTime(data.scanTime);
       } catch (err) {

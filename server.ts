@@ -33,6 +33,11 @@ async function startServer() {
     musicFiles.forEach(file => {
       const name = path.parse(file).name;
       const thumb = thumbFiles.find(tf => path.parse(tf).name === name);
+      
+      // Parse "Artist - Title" pattern
+      const parts = name.split(' - ');
+      const artist = parts.length > 1 ? parts[0].trim() : 'Unknown Artist';
+      const title = parts.length > 1 ? parts[1].trim() : name.replace(/_/g, ' ');
 
       if (!thumb) {
         errors.push({ type: 'THUMB_MISSING', file, message: `Audio "${file}" has no matching thumbnail` });
@@ -40,9 +45,9 @@ async function startServer() {
 
       tracks.push({
         id: name,
-        title: name.replace(/_/g, ' '),
-        artist: 'Unknown Artist',
-        album: 'Local Collection',
+        title: title,
+        artist: artist,
+        album: 'Local',
         audioUrl: `/music/${file}`,
         thumbnailUrl: thumb ? `/musicthumb/${thumb}` : 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=500&h=500&fit=crop',
         hasThumb: !!thumb

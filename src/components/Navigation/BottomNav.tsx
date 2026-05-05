@@ -33,21 +33,11 @@ export default function BottomNav({ items, activeTab, onTabChange }: BottomNavPr
             className="relative flex flex-col items-center justify-center w-12 h-12 outline-none group"
           >
             <div className={cn(
-              "p-2 rounded-xl transition-all duration-300",
-              isActive ? "bg-zinc-900 text-white scale-110" : "text-zinc-400"
+              "p-2.5 rounded-2xl transition-all duration-300",
+              isActive ? "bg-zinc-900 text-white scale-110 shadow-xl shadow-zinc-200" : "text-zinc-300 hover:text-zinc-500"
             )}>
-              <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+              <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
             </div>
-            
-            <AnimatePresence>
-              {isActive && (
-                <motion.div
-                  layoutId="active-nav"
-                  className="absolute -bottom-1 w-1 h-1 bg-zinc-900 rounded-full"
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                />
-              )}
-            </AnimatePresence>
           </button>
         );
       })}
