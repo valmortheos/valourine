@@ -2,9 +2,9 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
+    { "source": "/api/tracks", "destination": "/api/tracks" },
+    { "source": "/music/(.*)", "destination": "/music/$1" },
+    { "source": "/musicthumb/(.*)", "destination": "/musicthumb/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

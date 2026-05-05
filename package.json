@@ -1,5 +1,6 @@
 {
-  "name": "react-example",
+  "name": "valourine",
+  "homepage": ".",
   "private": true,
   "version": "0.0.0",
   "type": "module",
